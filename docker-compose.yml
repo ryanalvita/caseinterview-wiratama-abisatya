@@ -1,0 +1,32 @@
+services:
+  database:
+    image: postgres:15.7
+    container_name: caseinterview_database
+    ports:
+      - "5499:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abc
+      - POSTGRES_DB=caseinterview
+
+  app:
+    image: pyramid-app-caseinterview
+    build:
+      context: .
+      args:
+        CONTAINER_REGISTRY: ${CONTAINER_REGISTRY}
+        PIP_ACCESS_TOKEN: ${PIP_ACCESS_TOKEN}
+    container_name: caseinterview_app
+    environment:
+      - PG_PASSWORD=abc
+      - PG_USER=postgres
+      - PG_DBNAME=caseinterview
+      - PG_PORT=5432
+      - PG_HOST=database
+      - ACCOUNTS_TOKEN_SECRET=mysecret
+    depends_on: 
+      - "database"
+    ports:
+      - "6599:6543"
+      - "8888:8888"
+    tty: true
