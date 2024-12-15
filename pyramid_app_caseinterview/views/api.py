@@ -8,6 +8,8 @@ from pyramid_app_caseinterview.models.timeseries import Timeseries
 
 from pyramid_app_caseinterview.views.serialization import DateObject
 
+from sqlalchemy import func
+
 from . import View
 
 
@@ -38,7 +40,15 @@ class API(View):
         request_method="GET",
     )
     def depthseries_api(self):
-        query = self.session.query(Depthseries)
+        filter_max = self.session.query(
+            Depthseries.depth,
+            func.max(Depthseries.value).label("max_value")
+    ).group_by(Depthseries.depth).subquery()
+
+        query = self.session.query(Depthseries).join(
+            filter_max,
+            (Depthseries.depth == filter_max.c.depth) & (Depthseries.value == filter_max.c.max_value)
+        )
         return [
             {
                 "id": str(q.id),
