@@ -6,6 +6,8 @@ from pyramid.view import view_config
 from pyramid_app_caseinterview.models.depthseries import Depthseries
 from pyramid_app_caseinterview.models.timeseries import Timeseries
 
+from pyramid_app_caseinterview.views.serialization import DateObject
+
 from . import View
 
 
@@ -23,7 +25,7 @@ class API(View):
         return [
             {
                 "id": str(q.id),
-                "datetime": q.datetime,
+                "datetime": DateObject(q.datetime),
                 "value": q.value,
             }
             for q in query.all()
