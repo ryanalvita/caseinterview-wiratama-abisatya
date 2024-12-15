@@ -48,7 +48,7 @@ class API(View):
         query = self.session.query(Depthseries).join(
             filter_max,
             (Depthseries.depth == filter_max.c.depth) & (Depthseries.value == filter_max.c.max_value)
-        )
+        ).filter(Depthseries.value.isnot(None)) #filter out "null" values
         return [
             {
                 "id": str(q.id),
