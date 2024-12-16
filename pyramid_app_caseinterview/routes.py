@@ -11,3 +11,4 @@ def includeme(config):
     config.add_route("timeseries", "/api/v1/timeseries")
     config.add_route("depthseries", "/api/v1/depthseries")
     config.add_route("activity", "/api/v1/activity")
+    config.add_route("depthseries_download", "/api/v1/download/depthseries")
