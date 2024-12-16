@@ -85,7 +85,7 @@ class API(View):
     @view_config(
         route_name="depthseries_download",
         permission=NO_PERMISSION_REQUIRED,
-        renderer=None,
+        renderer="json",
         request_method="GET",
     )
     def download_depthseries_api(self):
@@ -98,7 +98,9 @@ class API(View):
             if end_depth:
                 end_depth = int(end_depth)
         except ValueError as e:
-            return {"Error": f"Require integer. [{e}]"}
+            return Response(
+                body= f"Error: Input Integers {e}",
+                status=400)
 
         query = self.session.query(Depthseries)
 
