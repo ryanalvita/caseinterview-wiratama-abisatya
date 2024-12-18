@@ -38,6 +38,7 @@ class API(View):
         except ValueError:
             return {"Error" : "Invalid date format. use YYYY-MM-DD."}
         
+        query = self.session.query(Timeseries)
         
         if start_date and end_date:
             query = query.filter((Timeseries.datetime >= start_date) & (Timeseries.datetime <= end_date))
@@ -45,8 +46,6 @@ class API(View):
             query = query.filter((Timeseries.datetime >= start_date))
         if end_date:
             query = query.filter((Timeseries.datetime <= end_date)) 
-        else:
-            query = self.session.query(Timeseries)
 
         return [
             {
