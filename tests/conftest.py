@@ -5,10 +5,15 @@ import os
 import pytest
 import transaction
 import webtest
+
+from datetime import datetime, timedelta
+import random
+
 from paste.deploy.loadwsgi import appconfig
 
 from pyramid_app_caseinterview import main
-from pyramid_app_caseinterview.models import Base, User, get_tm_session
+from pyramid_app_caseinterview.models import Base, get_tm_session
+from pyramid_app_caseinterview.models.timeseries import Timeseries
 
 from .helpers import sign_in, user_remove
 
@@ -89,3 +94,30 @@ def authenticated_user(testapp, session_tm):
         user_id = user.id
     yield session_tm.query(User).filter(User.name == "user").one()
     user_remove(testapp, user_id)
+
+@pytest.fixture(scope="function")
+def populate_timeseries_data(session_tm):
+    """Fixture to populate dummy data into the 'timeseries' table."""
+    print("Populating dummy data into 'timeseries' table...")
+
+    # Generate 100 dummy rows
+    dummy_data = []
+    for i in range(100):
+        random_datetime = datetime(
+            year=random.randint(2020, 2023),
+            month=random.randint(1, 12),
+            day=random.randint(1, 28),
+        )
+        dummy_entry = Timeseries(
+            datetime=random_datetime,
+            value=round(random.uniform(10.0, 100.0), 2)  # Random value between 10 and 100
+        )
+        dummy_data.append(dummy_entry)
+
+    # Add the data to the session and commit within the transaction manager scope
+    session_tm.add_all(dummy_data)
+    session_tm.flush()  # Flush changes to ensure they are saved to the DB
+    transaction.manager.commit()  # Commit the transaction
+    
+    yield
+    pass
