@@ -36,7 +36,7 @@ class API(View):
         request_method="GET",
     )
     def depthseries_api(self):
-        query = self.session.query(Depthseries)
+        query = self.session.query(Depthseries).filter(Depthseries.value.isnot(None)) #filter out "null" values
         return [
             {
                 "id": str(q.id),
